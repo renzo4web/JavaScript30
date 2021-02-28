@@ -12,38 +12,39 @@ async function fetchData() {
 
 dataJson = fetchData();
 
-searchInput.addEventListener('input', () => {
-  console.log(searchInput.value);
-  let t = [];
-  dataJson.then(data => {
-    let g = (data.find(element => element.city.includes(searchInput.value)));
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
 
-    const cityListItem = document.createElement('li');
-    const hl = document.createElement('strong');
-    const span = document.createElement('span');
-    const population = document.createElement('span');
-    const p = document.createElement('p');
-    hl.textContent = searchInput.value;
-    population.textContent = g.population;
-    hl.classList.add('hl');
-    population.classList.add('population');
-    // const index = g.city.replace(searchInput.value, '*').indexOf("");
-    const index = g.city.split(searchInput.value).join('');
-    console.log({index}, g.city.split(searchInput.value));
-    span.textContent = index;
-    p.appendChild(hl);
-    p.appendChild(span);
-    // cityListItem.textContent = `${g.city}  =>   ${g.population}`;
-    cityListItem.appendChild(p);
-    cityListItem.appendChild(population);
-    suggestions.insertAdjacentElement('afterbegin', cityListItem);
+const displayResults = (data) => {
 
-    // suggestions.querySelectorAll('li').forEach(li=>{
-    //   console.log(li.textContent.includes(searchInput.value));
-    // })
+  const element = data.map(place => {
+
+    const regex = new RegExp(searchInput.value, 'gi');
+    const cityName = place.city.replace(regex,
+        `<span class="hl">${searchInput.value}</span>`);
+    const stateName = place.state.replace(regex,
+        `<span class="hl">${searchInput.value}</span>`);
+    return `
+      <li>
+        <span class="name">${cityName}, ${stateName}</span>
+        <span class="population">${numberWithCommas(place.population)}</span>
+      </li>
+    `;
 
   });
+  suggestions.innerHTML = element;
 
-  if (searchInput.value <= 1) suggestions.innerHTML = '';
+};
+
+searchInput.addEventListener('change', () => {
+  dataJson.then(dataRes => {
+    let data = dataRes.filter(places => {
+      const regex = new RegExp(searchInput.value, 'gi');
+      return places.city.match(regex) || places.state.match(regex);
+    });
+    displayResults(data);
+  });
+
+  if (searchInput.value === '') suggestions.innerHTML = '';
 });
-console.log();
