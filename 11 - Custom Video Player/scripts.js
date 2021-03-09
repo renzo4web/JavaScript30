@@ -31,10 +31,32 @@ playerBtn.forEach((btn) =>
   })
 );
 
-const fillingProBar = () => {
+const fillingProBar = (slider) => {
+  // if (slider) {
+  //   progressFilled.style.flexBasis = `${((slider-50) * 100) / video.duration}%`;
+  //   return
+  // }
   progressFilled.style.flexBasis = `${
     (video.currentTime * 100) / video.duration
   }%`;
 };
 
 video.addEventListener('timeupdate', fillingProBar);
+
+let mousedown = false;
+progressBar.addEventListener('mousedown', () => {
+  mousedown = true;
+});
+
+progressBar.addEventListener('mousemove', (e) => {
+  if (mousedown) {
+    video.currentTime = (e.offsetX / progressBar.offsetWidth) * video.duration ;
+    fillingProBar();
+  }
+});
+
+progressBar.addEventListener('mouseup', () => {
+  video.currentTime =
+    (parseInt(progressFilled.style.flexBasis) * video.duration) / 100;
+  mousedown = false;
+});

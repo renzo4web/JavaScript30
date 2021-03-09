@@ -6,3 +6,4 @@ const playerBtn = document.querySelectorAll(
 );
 const video = document.querySelector('video');
 const progressFilled = document.querySelector('.progress__filled');
+const progressBar = document.querySelector('.progress');
